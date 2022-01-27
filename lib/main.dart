@@ -28,14 +28,28 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final _toDoController = TextEditingController();
+
   List _toDoList = [];
+
+  void _addToDo(){
+    setState(() {
+      Map<String, dynamic> newToDo = Map();
+      newToDo["title"] = _toDoController.text;
+      _toDoController.text = "";
+      newToDo["ok"] = false;
+      _toDoList.add(newToDo);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Lista de Tarefas"),
+      appBar: AppBar(
+        title: Text("Lista de Tarefas"),
         backgroundColor: Colors.blueAccent,
-        centerTitle: true,),
+        centerTitle: true,
+      ),
       body: Column(
         children: [
           Container(
@@ -44,25 +58,44 @@ class _HomeState extends State<Home> {
               children: [
                 Expanded(
                   child: TextField(
+                    controller: _toDoController,
                     decoration: InputDecoration(
                       labelText: "Nova Tarefa",
                       labelStyle: TextStyle(color: Colors.blueAccent),
                     ),
                   ),
                 ),
-                ElevatedButton(onPressed: () {},
+                ElevatedButton(
+                  onPressed: _addToDo,
                   child: Text("ADD"),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.blueAccent,
-                    textStyle: TextStyle(
-                      color: Colors.white,
-                    )
-                  ),
+                      primary: Colors.blueAccent,
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                      )),
                 ),
-
               ],
             ),
           ),
+          Expanded(
+            child: ListView.builder(
+                padding: EdgeInsets.only(top: 10.0),
+                itemCount: _toDoList.length,
+                itemBuilder: (context, index) {
+                  return CheckboxListTile(
+                      title: Text(_toDoList[index]["title"]),
+                      value: _toDoList[index]["ok"],
+                      secondary: CircleAvatar(
+                        child: Icon(
+                          _toDoList[index]["ok"] ? Icons.check : Icons.error,
+                        ),
+                      ), onChanged: (check) {
+                        setState(() {
+                          _toDoList[index]["ok"] = check;
+                        });
+                  },) ;
+                }),
+          )
         ],
       ),
     );
